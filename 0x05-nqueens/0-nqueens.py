@@ -1,39 +1,50 @@
 #!/usr/bin/python3
-"""N queens puzzle
-"""
 import sys
 
-
-def isSafe(board, row, col):
-    """Check if the position is safe for the queen"""
-    for c in range(col):
-        if board[c] is row or abs(board[c] - row) is abs(c - col):
+def is_safe(board, row, col):
+    # Check if there is a queen in the same column
+    for i in range(row):
+        if board[i] == col or \
+           board[i] - i == col - row or \
+           board[i] + i == col + row:
             return False
     return True
 
-
-def solveNQ(board, col):
-    """Solve the N queen problem"""
-    if col is len(board):
-        print(str([[c, board[c]] for c in range(len(board))]))
+def solve_nqueens_util(n, row, board, solutions):
+    if row == n:
+        solutions.append([[i, board[i]] for i in range(n)])
         return
-    for row in range(len(board)):
-        if isSafe(board, row, col):
-            board[col] = row
-            solveNQ(board, col + 1)
+    
+    for col in range(n):
+        if is_safe(board, row, col):
+            board[row] = col
+            solve_nqueens_util(n, row + 1, board, solutions)
 
+def solve_nqueens(n):
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+    
+    board = [-1] * n
+    solutions = []
+    solve_nqueens_util(n, 0, board, solutions)
+    return solutions
 
 if __name__ == "__main__":
-    if len(sys.argv) is not 2:
+    if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
-    if not sys.argv[1].isdigit():
+    try:
+        N = int(sys.argv[1])
+    except ValueError:
         print("N must be a number")
         sys.exit(1)
-    N = int(sys.argv[1])
+    
     if N < 4:
         print("N must be at least 4")
         sys.exit(1)
-    board = [0 for col in range(N)]
-    solveNQ(board, 0)
+
+    solutions = solve_nqueens(N)
+    for solution in solutions:
+        print(solution)
 
